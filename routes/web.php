@@ -1,18 +1,28 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\HomeController;
 
-Route::resource('books', BookController::class);
-Route::get('/books', [BookController::class, 'index'])->name('books.index');
-Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
-Route::post('/books', [BookController::class, 'store'])->name('books.store');
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
+// Default route diarahkan ke login
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
-Route::get('/pegawai', function () {
-    return view('Pegawai');
+// Route bawaan Laravel Auth (login, register, reset password, dll.)
+Auth::routes();
+
+// Hanya bisa diakses jika sudah login
+Route::middleware(['auth'])->group(function () {
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+    // Resource route untuk books
+    Route::resource('books', BookController::class);
 });
