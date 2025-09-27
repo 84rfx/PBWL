@@ -1,62 +1,52 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Daftar Buku</h1>
-        <a href="{{ route('books.create') }}" class="btn btn-primary">+ Tambah Buku</a>
-    </div>
-
-    @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>📖 Daftar Buku</h2>
+            <a href="{{ route('books.create') }}" class="btn btn-success">Tambah Buku</a>
         </div>
-    @endif
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>No</th>
-                <th>Judul</th>
-                <th>Penulis</th>
-                <th>Penerbit</th>
-                <th>Tahun</th>
-                <th>Harga</th>
-                <th>Stok</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($books as $index => $book)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $book->title }}</td>
-                    <td>{{ $book->author }}</td>
-                    <td>{{ $book->publisher }}</td>
-                    <td>{{ $book->year }}</td>
-                    <td>
-                        @if (!is_null($book->price))
-                            Rp {{ number_format($book->price, 0, ',', '.') }}
-                        @else
-                            -
-                        @endif
-                    </td>
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
 
-                    <td>{{ $book->stock }}</td>
-                    <td>
-                        <a href="{{ route('books.edit', $book->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                        <form action="{{ route('books.destroy', $book->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger"
-                                onclick="return confirm('Yakin hapus buku ini?')">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="8" class="text-center">Belum ada data buku.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+        @if ($books->isEmpty())
+            <div class="alert alert-info text-center">Belum ada buku 📭</div>
+        @else
+            <div class="row">
+                @foreach ($books as $book)
+                    <div class="col-md-3 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            {{-- Cover Buku --}}
+                            @if ($book->cover)
+                                <img src="{{ Storage::url($book->cover) }}" class="card-img-top"
+                                    style="height:250px; width:100%; object-fit:cover; border-bottom:1px solid #ddd;">
+                            @else
+                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                    style="height:250px; width:100%;">
+                                    <span class="text-muted">Tidak ada cover</span>
+                                </div>
+                            @endif
+
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $book->title }}</h5>
+                                <p class="card-text"><small class="text-muted">by {{ $book->author }}</small></p>
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ route('books.show', $book->id) }}" class="btn btn-info btn-sm">Detail</a>
+                                    <a href="{{ route('books.edit', $book->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                    <form method="POST" action="{{ route('books.destroy', $book->id) }}"
+                                        onsubmit="return confirm('Yakin hapus buku ini?')" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-danger btn-sm">Hapus</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </div>
 @endsection

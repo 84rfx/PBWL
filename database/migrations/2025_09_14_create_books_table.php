@@ -12,10 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('author');
-            $table->string('publisher');
-            $table->integer('year');
-            $table->decimal('price', 10, 2);
-            $table->integer('stock');
+            $table->string('cover')->nullable(); // hanya cover yang opsional
             $table->timestamps();
         });
     }
